@@ -1,10 +1,10 @@
 <template>
   <section class="app-nav-search">
     <NavBar/>
-    <SearchBar :search="searchBookList"/>
+    <SearchBar @returnBookList="this.searchBookList" :bookList="this.bookList"/>
   </section>
-  <BooksTable :books="this.bookList" v-if="!this.typed"/>
-  <BooksTable :books="this.searchResult" v-else/>
+  <BooksTable :books="this.bookList" v-if="!this.checkSearchResults()"/>
+  <BooksTable :books="this.localResult" v-else/>
 
   <div v-show="false" class="alert alert-success" role="alert">
     Book included successfully!
@@ -18,7 +18,6 @@
 import BooksTable from './components/BooksTable.vue';
 import NavBar from './components/NavBar.vue';
 import SearchBar from './components/SearchBar.vue';
-
 export default {
   name: 'App',
   components: {
@@ -28,11 +27,9 @@ export default {
   },
   data() {
     return {
-      typed: false,
-      userInput: '',
-      searchResult: [],
       bookList: [],
-      bookApi: "http://localhost:80/api-vue/api/rest/V1/book-api.php"
+      bookApi: "http://localhost:80/api-vue/api/rest/V1/book-api.php",
+      localResult: [],
     }
   },
   methods: {
@@ -40,19 +37,19 @@ export default {
       let result = await fetch(this.bookApi);
       this.bookList = await result.json();
     },
-    searchBookList(){
-      if (this.userInput !== "") {
-        this.typed = true;
+    
+    searchBookList(e) {
+      this.localResult = e;
+    },
+
+    checkSearchResults() {
+      if (this.localResult.length > 0) {
+        return true;
+      } else {
+        return false;
       }
-      this.searchResult = this.bookList.filter(
-        (book) => book.title.toLowerCase().includes(this.userInput.toLowerCase())
-      );
-      // foreach(book in this.bookList){
-      //   if(book.title.toLowerCase().includes(this.userInput.toLowerCase())) {
-      //     this.searchResult.push(book);
-      //   }
-      // }
-      return this.searchResult;
+
+      // return (this.localResult.length > 0);
     }
   },
   created() {

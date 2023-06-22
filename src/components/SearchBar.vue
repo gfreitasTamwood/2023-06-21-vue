@@ -13,6 +13,24 @@
 
 <script>
 export default {
-    name: 'SearchBar'
+    name: 'SearchBar',
+    props: {
+        bookList: []
+    },
+    data() {
+        return {
+            userInput: '',
+            searchResult: [],
+        }
+    },
+    methods:{
+        searchBookList(){
+            this.searchResult = this.bookList.filter(
+                (book) => book.title.toLowerCase().includes(this.userInput.toLowerCase())
+            );
+
+            this.$emit("returnBookList", this.searchResult);
+        }
+    }
 }
 </script>
